@@ -3,11 +3,12 @@ package helium.video.VideoArchiveService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import javax.annotation.Nullable;
+
 @SpringBootApplication
 public class VideoArchiveServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(VideoArchiveServiceApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(VideoArchiveServiceApplication.class, args);
+  }
 }
