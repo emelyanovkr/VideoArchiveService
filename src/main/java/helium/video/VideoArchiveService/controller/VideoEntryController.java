@@ -1,54 +1,37 @@
 package helium.video.VideoArchiveService.controller;
 
+import helium.video.VideoArchiveService.service.VideoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 @Controller
 @RequestMapping("/input/video")
 public class VideoEntryController {
 
-  @GetMapping("/info")
-  public String info() {
-    return "input/video/info";
+  private final VideoService videoService;
+  private final Logger LOGGER = LoggerFactory.getLogger(VideoEntryController.class);
+
+  public VideoEntryController(VideoService videoService) {
+    this.videoService = videoService;
   }
 
   @PostMapping("/upload")
   public ResponseEntity<String> acceptVideoController(@RequestParam("file") MultipartFile file) {
     try {
-      Path uploadDirPath = Paths.get("uploads");
-      if (!Files.exists(uploadDirPath)) {
-        Files.createDirectory(uploadDirPath);
-      }
-
-      if (file.getOriginalFilename() == null) {
-        // TODO: create custom exception
-        throw new RuntimeException();
-      }
-      Path filePath = uploadDirPath.resolve(file.getOriginalFilename());
-
-      try (OutputStream outputStream = new FileOutputStream(filePath.toFile())) {
-        outputStream.write(file.getBytes());
-      } catch (IOException e) {
-        // TODO: LOGGING
-        throw new RuntimeException(e);
-      }
-
-      return ResponseEntity.created(filePath.toUri())
-          .body("File created: " + filePath.toAbsolutePath());
-
-    } catch (IOException e) {
-      throw new RuntimeException("Error creating file", e);
+      videoService.saveVideoFile(file);
+      LOGGER.info("Successfully created file - {}", file.getOriginalFilename());
+      return ResponseEntity.status(HttpStatus.CREATED).body("CREATED FILE - " + file.getOriginalFilename());
+    } catch (Exception e) {
+      // TODO: CUSTOM EXCEPTION HANLDING
+      LOGGER.error("EXCEPTION ACQUIRING VIDEO - ", e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
   }
 }
