@@ -2,6 +2,7 @@ package helium.video.VideoArchiveService.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
@@ -18,15 +19,15 @@ public class VideoEntry {
   private String name;
 
   @Column(name = "create_date")
-  @NotEmpty(message = "create_date must be defined")
+  @NotNull(message = "create_date must be defined")
   private LocalDateTime create_date;
 
   @Column(name = "length")
-  @NotEmpty(message = "file_length must be defined")
-  private long length;
+  @NotNull(message = "file_length must be defined")
+  private double duration;
 
   @Column(name = "size_mb")
-  @NotEmpty(message = "file size must be defined")
+  @NotNull(message = "file size must be defined")
   private double size_mb;
 
   @Column(name = "resolution")
@@ -36,10 +37,10 @@ public class VideoEntry {
   public VideoEntry() {}
 
   public VideoEntry(
-      String name, LocalDateTime create_date, long length, double size_mb, String resolution) {
+      String name, LocalDateTime create_date, double duration, double size_mb, String resolution) {
     this.name = name;
     this.create_date = create_date;
-    this.length = length;
+    this.duration = duration;
     this.size_mb = size_mb;
     this.resolution = resolution;
   }
@@ -68,12 +69,12 @@ public class VideoEntry {
     this.create_date = create_date;
   }
 
-  public long getLength() {
-    return length;
+  public double getLength() {
+    return duration;
   }
 
-  public void setLength(long length) {
-    this.length = length;
+  public void setLength(double duration) {
+    this.duration = duration;
   }
 
   public double getSize_mb() {

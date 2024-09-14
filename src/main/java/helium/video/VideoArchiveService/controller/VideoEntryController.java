@@ -30,7 +30,7 @@ public class VideoEntryController {
       return ResponseEntity.status(HttpStatus.CREATED).body("CREATED FILE - " + file.getOriginalFilename());
     } catch (Exception e) {
       // TODO: CUSTOM EXCEPTION HANLDING
-      LOGGER.error("EXCEPTION ACQUIRING VIDEO - ", e);
+      LOGGER.error("EXCEPTION SAVING FILE - ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
   }
