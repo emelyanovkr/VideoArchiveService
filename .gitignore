@@ -17,6 +17,7 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 /src/main/resources/application.properties
+/src/main/resources/log4j2-spring.xml
 
 ### IntelliJ IDEA ###
 .idea
@@ -36,3 +37,4 @@ out/
 
 ### VS Code ###
 .vscode/
+

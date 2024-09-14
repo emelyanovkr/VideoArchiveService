@@ -1,52 +1,68 @@
 plugins {
-	id 'com.gradleup.shadow' version '8.3.1'
-	id 'java'
-	id 'org.springframework.boot' version '3.3.3'
-	id 'io.spring.dependency-management' version '1.1.6'
-	id "net.ltgt.errorprone" version "4.0.1"
+    id 'com.gradleup.shadow' version '8.3.1'
+    id 'java'
+    id 'org.springframework.boot' version '3.3.3'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id "net.ltgt.errorprone" version "4.0.1"
 }
 
 group = 'helium.video'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
+// For Log4j2 implementation
+/*configurations {
+    all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    all*.exclude group: 'ch.qos.logback', module: 'logback-classic'
+    all*.exclude group: 'ch.qos.logback', module: 'logback-core'
+}
+dependencies -> implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+*/
+
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	errorprone 'com.uber.nullaway:nullaway:0.10.25'
-	compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-	errorprone 'com.google.errorprone:error_prone_core:2.29.0'
-	errorproneJavac "com.google.errorprone:javac:9+181-r4173-1"
+    // TODO: add spring security
 
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    errorprone 'com.uber.nullaway:nullaway:0.11.2'
+    compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+    errorprone 'com.google.errorprone:error_prone_core:2.32.0'
+    errorproneJavac "com.google.errorprone:javac:9+181-r4173-1"
+
+    implementation 'org.apache.tika:tika-core:3.0.0-BETA2'
+    implementation 'org.apache.tika:tika-parsers-standard-package:3.0.0-BETA2'
 }
 
 import net.ltgt.gradle.errorprone.CheckSeverity
 
 tasks.withType(JavaCompile) {
-	// remove the if condition if you want to run NullAway on test code
-	if (!name.toLowerCase().contains("test")) {
-		options.errorprone {
-			check("NullAway", CheckSeverity.ERROR)
-			option("NullAway:AnnotatedPackages", "helium.video")
-		}
-	}
+    options.errorprone {
+        // always set annotated packages to be safe
+        option("NullAway:AnnotatedPackages", "com.foo")
+    }
+    if (name.toLowerCase().contains("test")) {
+        options.errorprone {
+            disable("NullAway")
+        }
+    }
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
