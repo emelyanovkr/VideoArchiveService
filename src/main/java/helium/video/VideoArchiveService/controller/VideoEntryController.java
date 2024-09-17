@@ -1,15 +1,19 @@
 package helium.video.VideoArchiveService.controller;
 
 import helium.video.VideoArchiveService.service.VideoService;
+import helium.video.VideoArchiveService.util.MessageConstants;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 @Controller
 @RequestMapping("/input/video")
@@ -23,15 +27,15 @@ public class VideoEntryController {
   }
 
   @PostMapping("/upload")
-  public ResponseEntity<String> acceptVideoController(@RequestParam("file") MultipartFile file) {
+  public ResponseEntity<String> handleFileUpload(
+      HttpServletRequest request, @RequestHeader("File-Name") String fileName) {
     try {
-      videoService.saveVideoFile(file);
-      LOGGER.info("Successfully created file - {}", file.getOriginalFilename());
-      return ResponseEntity.status(HttpStatus.CREATED).body("CREATED FILE - " + file.getOriginalFilename());
-    } catch (Exception e) {
-      // TODO: CUSTOM EXCEPTION HANLDING
-      LOGGER.error("EXCEPTION SAVING FILE - ", e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+      String operationResult = videoService.saveVideoFile(request, fileName).get();
+      LOGGER.info("{}: {}", operationResult, fileName);
+      return ResponseEntity.status(HttpStatus.OK).body(operationResult + ": " + fileName);
+    } catch (IOException | InterruptedException | ExecutionException ex) {
+      LOGGER.error("ERROR SAVING FILE - ", ex);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
   }
 }
